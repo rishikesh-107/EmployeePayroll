@@ -8,13 +8,13 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class EmployeeEntity {
 
 	@Id
-	Integer id;
+	String id;
 	String firstName;
 	String lastName;
 	Integer age;
 	Double ctc;
 	String organisation;
-	public EmployeeEntity(Integer id, String firstName, String lastName, Integer age, Double ctc, String organisation) {
+	public EmployeeEntity(String id, String firstName, String lastName, Integer age, Double ctc, String organisation) {
 		super();
 		this.id = id;
 		this.firstName = firstName;
@@ -27,10 +27,10 @@ public class EmployeeEntity {
 	{
 		
 	}
-	public Integer getId() {
+	public String getId() {
 		return id;
 	}
-	public void setId(Integer id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 	public String getFirstName() {

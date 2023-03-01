@@ -15,16 +15,38 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.DAO.EmployeeDAO;
 import com.example.entity.EmployeeEntity;
+import com.example.service.Producer;
 
 @RestController	@RequestMapping("/employees")
 public class EmployeeController {
    
 	@Autowired
 	private EmployeeDAO employeeRepository;
+	@Autowired
+	private Producer employeeService;
+	@Autowired
+    Producer kafkaProducer;
+
+	
+	
+	
+	
+	
+	
+	//@0PostMapping("/employees/{id}/cost-to-company")
+    //public void updateCostToCompany(@PathVariable("id") Long id, @RequestBody EmployeeEntity costToCompanyUpdate) {
+        // Update the employee's cost to company in the database
+        // ...
+
+        // Send a message to Kafka with the updated cost to company information
+      //  kafkaTemplate.send("payroll-topic", costToCompanyUpdate);
+    //}
+	
 	
 	
 	 @PostMapping
@@ -42,23 +64,41 @@ public class EmployeeController {
 	    }
 
 	    @GetMapping("/{id}")
-	    public Optional<EmployeeEntity> getEmployeeById(@PathVariable("id") Integer id) {
+	    public Optional<EmployeeEntity> getEmployeeById(@PathVariable("id") String id) {
 	        
 	    	return employeeRepository.findById(id);
 	        
 	    }
 
 	    @PutMapping("/{id}")
-	    public ResponseEntity<EmployeeEntity> updateEmployee(@PathVariable("id")Integer id, @RequestBody EmployeeEntity employee) {
+	    public ResponseEntity<EmployeeEntity> updateEmployee(@PathVariable("id")String id, @RequestBody EmployeeEntity employee) {
 	        employee.setId(id);
+	        
 	        EmployeeEntity entity= employeeRepository.save(employee);
+	       
+	      /// kafkaProducer.sendCTCupdate(String.valueOf(id),String.valueOf(employee.getCtc()));
+	         //kafkaProducer.updateCTCMessageTopic(employee);
 	        return new ResponseEntity<EmployeeEntity>(entity,HttpStatus.CREATED);
 	    }
 
 	    @DeleteMapping("/{id}")
-	    public ResponseEntity<String> deleteEmployee(@PathVariable("id")Integer id) {
+	    public ResponseEntity<String> deleteEmployee(@PathVariable("id")String id) {
 	        employeeRepository.deleteById(id);
 	        return new ResponseEntity<String>("employee deleted",HttpStatus.ACCEPTED) ;
+	    }
+//	    @GetMapping(value = "/producer")
+//	    public String sendMessage(@RequestParam("message") String message)
+//	    {
+//	        kafkaProducer.sendMessageToTopic(message);
+//	        return "Message sent Successfully to the your code decode topic ";
+//	    }
+	    
+	    
+	    
+	    @PutMapping("/{employeeId}/ctc")
+	    public ResponseEntity<String> updateEmployeeCTC(@PathVariable("employeeId") String employeeId, @RequestParam("ctc") double ctc) {
+	        employeeService.updateEmployeeCTC(employeeId, ctc);
+	        return ResponseEntity.ok("Employee CTC updated successfully");
 	    }
 	}
 
